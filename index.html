@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="A handy dialogue tool for Parlor Ghost Games.">
+    <meta name="author" content="Taylor Cunningham">
+    <link rel="icon" href="ghost_favicon.ico">
+
+    <title>PGG Dialogue Tool</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Dialogue tool stylesheet -->
+    <link rel="stylesheet" type="text/css" href="dialogue_tool.css">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div id="master-div">
+
+         <div id="left-div">
+
+              <button id="clearStorage" type="button" class="btn btn-warning">Clear web storage</button>
+              <button id="addBtn" type="button" class="btn btn-primary">Add a new node</button>
+              <button id="deleteBtn" type="button" class="btn btn-danger">Delete node</button>
+               </br>
+               </br>
+
+               <ul id="master-list"></ul>
+
+
+
+         </div>
+
+         <div id="vertical-divider"></div>
+
+         <div id="right-div">
+
+              <form id="node-form">
+                <div class="form-group">
+                       <label for="name">Node Name</label>
+                       <textarea id="name" class="form-control" rows="1"></textarea>
+                 </div>
+                 <div class="form-group">
+                      <label for="sel1">Parent Node</label>
+                      <select id="parentSelect" class="form-control"></select>
+                 </div>
+                <div class="form-group">
+                      <label for="actor">Actor</label>
+                      <textarea id="actor" class="form-control" rows="1"></textarea>
+                 </div>
+                 <div class="form-group">
+                     <label for="message">Message</label>
+                     <textarea id="message" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="type">Type</label>
+                    <textarea id="type" class="form-control" rows="1"></textarea>
+               </div>
+               <div class="form-group">
+                     <label for="condition">Condition</label>
+                     <textarea id="condition" class="form-control" rows="1"></textarea>
+               </div>
+
+               <button id="submitBtn" type="button" class="btn btn-primary">Submit</button>
+              </form>
+
+              <div id="horizontal-divider"></div>
+              <div id="title-div" class="form-group">
+                    <label for="title">Conversation Name</label>
+                    <textarea id="title" class="form-control" rows="1"></textarea>
+              </div>
+            <button id="downloadBtn" type="button" class="btn btn-success">Download</button>
+         </div>
+
+
+    </div><!-- /.container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <!-- Custom scripts for dialogue tool -->
+    <script type="text/javascript" src="dialogue-tool-functions.js"></script>
+    <script type="text/javascript" src="dialogue_tool.js"></script>
+
+  </body>
+</html>
