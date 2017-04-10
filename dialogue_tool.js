@@ -15,8 +15,10 @@ $.each(nodeHash, function(key, value) {
 
 // Clear Storage button removes masterObj & nodehash and refreshes the page
 $("#clearStorage").click(function() {
-     localStorage.clear()
-     location.reload()
+     if (confirm("Are you sure?")) {
+          localStorage.clear()
+          location.reload()
+     }
 })
 
 $("#addBtn").click(function() {
