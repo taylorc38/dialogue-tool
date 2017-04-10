@@ -1,4 +1,5 @@
 function clearForm() {
+     $("#nodeId").html("")
      $("#node-form").trigger("reset")
      $("#parentSelect").prop("disabled", false)
 }
@@ -38,6 +39,7 @@ function getNameById(hash, id) {
 }
 
 function showNode(obj, nodeHash) {
+     $("#nodeId").html(obj.nodeId)
      $("#name").val(getNameById(nodeHash, obj.nodeId))
      $("#actor").val(obj.actor)
      $("#condition").val(obj.condition)
@@ -48,15 +50,16 @@ function showNode(obj, nodeHash) {
 
 function drawTree(masterObj, nodeHash, node) {
      var name = getNameById(nodeHash, node.nodeId)
-     var htmlStr = "<li id='"+name+"'>"+name+"</li>"
+     var id = node.nodeId.toString()
+     var htmlStr = "<li id='"+id+"'>"+name+"</li>"
      var addStr = node.connections.length > 0
-          ? "<ul id='"+name+"-list' class='node-list'></ul>"
+          ? "<ul id='"+id+"-list' class='node-list'></ul>"
           : ""
-     var parentName = node.nodeId == 0
+     var parentId = node.nodeId == 0
                          ? "master-list"
-                         : getNameById(nodeHash, masterObj[node.previous.toString()].nodeId) + "-list"
+                         : masterObj[node.previous.toString()].nodeId + "-list"
 
-     $("#"+parentName).append(htmlStr + addStr)
+     $("#"+parentId).append(htmlStr + addStr)
      for (var i = 0; i < node.connections.length; i++) {
           var child = masterObj[node.connections[i].toString()]
           drawTree(masterObj, nodeHash, child)
@@ -70,8 +73,7 @@ function renderList(masterObj, nodeHash) {
           drawTree(masterObj, nodeHash, masterObj["0"])
 
      $("li").click(function() {
-          var name = $(this).attr("id")
-          var id = nodeHash[name]
+          var id = $(this).attr("id")
           showNode(masterObj[id.toString()], nodeHash)
      })
 }

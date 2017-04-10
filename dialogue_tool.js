@@ -49,13 +49,19 @@ $("#deleteBtn").click(function() {
      }
 })
 
-// Assign function to submit button
 $("#submitBtn").click(function() {
      // If we are editing an existing node, we should use the nodeId it already has
-     var name = $("#name").val()
-     var nodeId = nodeHash[name] != null
-                    ? nodeHash[name]
-                    : Object.keys(masterObj).length
+     // We will also need to preserve its connections
+     var editing = false
+     if ($("#nodeId").html() != "") {
+          editing = true
+     }
+     var nodeId = Object.keys(masterObj).length
+     var connections = []
+     if (editing) {
+          nodeId = parseInt($("#nodeId").html())
+          connections = masterObj[nodeId.toString()].connections
+     }
 
      // Validate previous and convert to nodeId
      var previous = -1
@@ -69,6 +75,10 @@ $("#submitBtn").click(function() {
           }
      }
 
+     // Assign this node to its parent's connections if it's new
+     if (nodeId > 0 && !editing)
+          masterObj[previous+""].connections.push(nodeId)
+
      // turn form data into an object
      var obj = {
           "nodeId" : nodeId,
@@ -77,20 +87,27 @@ $("#submitBtn").click(function() {
           "msg" : $("#message").val(),
           "type" : $("#type").val(),
           "previous" : previous,
-          "connections" : []
+          "connections" : connections
      }
 
      // Store the name in a hash map
+     // If we are editing a node, we need to figure out if the name has changed
+     // If so, we need to change the hash key for this nodeId
+     var name = $("#name").val()
+     if (nodeHash[name] == null){
+          for (var key in nodeHash) {
+               if (nodeHash[key] == nodeId) {
+                    // We've found this node under a different name, which means the name has been changed
+                    delete nodeHash[key]
+                    nodeHash = JSON.parse(JSON.stringify(nodeHash))
+                    break
+               }
+          }
+     }
      nodeHash[name] = nodeId
 
      // Add to masterObj
      masterObj[obj.nodeId.toString()] = obj
-
-     console.log(JSON.stringify(masterObj))
-
-     // Assign this node to its parent's connections
-     if (nodeId > 0)
-          masterObj[previous+""].connections.push(nodeId)
 
      // Save to web storage
      localStorage.masterObj = JSON.stringify(masterObj)
