@@ -6,5 +6,6 @@ sourceDir=./src
 echo "Creating "${packageName}
 
 cp README.txt ${sourceDir}
+rm -rf ${stagingDir}/*
 zip -r ${stagingDir}/${packageName}.zip ${sourceDir}
 rm ${sourceDir}/README.txt
