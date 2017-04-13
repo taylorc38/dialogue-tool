@@ -4,6 +4,44 @@ var nodeHash = JSON.parse(localStorage.nodeHash || "{}")
 // Render the list
 renderList(masterObj, nodeHash)
 
+var handleFileSelect = function(event) {
+     var file = event.target.files[0]
+     var reader = new FileReader()
+     reader.readAsText(file)
+     reader.onload = function() {
+          if (confirm("Are you sure you want to import this file?")) {
+               try {
+                    var content = JSON.parse(reader.result)
+                    masterObj = content
+                    nodeHash = {}
+                    // create a new nodeHash, nodeId will be used as default node name
+                    for (var key in masterObj) {
+                         var node = masterObj[key]
+                         var name = "Node" + node.nodeId
+                         nodeHash[name] = node.nodeId
+                    }
+                    // Save to web storage
+                    localStorage.masterObj = JSON.stringify(masterObj)
+                    localStorage.nodeHash = JSON.stringify(nodeHash)
+                    location.reload()
+               } catch (err) {
+                    alert("There was an error importing your file: " + err)
+               }
+          }
+     }
+}
+
+// Set file input event handler
+if (window.File && window.FileReader) {
+      $("#fileInput").change(function(event) {
+           handleFileSelect(event)
+      })
+} else {
+     alert("Your browser doesn't support importing JSON files. Sorry!");
+     $("#fileInput").prop("disabled", true)
+}
+
+
 // Set the Parent Node dropdown
 $("#parentSelect").append($("<option>-</option>"))
 $.each(nodeHash, function(key, value) {
