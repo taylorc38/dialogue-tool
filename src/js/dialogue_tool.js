@@ -26,6 +26,7 @@ var handleFileSelect = function(event) {
                     location.reload()
                } catch (err) {
                     alert("There was an error importing your file: " + err)
+                    $("#fileInput").val("") // reset file input element
                }
           }
      }

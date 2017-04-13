@@ -9,7 +9,7 @@ Usage
 - Each node after the root node must have one parent, and each node may have multiple children
 - Click on the node names in the list on the left-hand side to view that node
 - You may edit any traits of the selected node except for its parent
-
+- You may import a JSON file using the file input element at the bottom right of the screen. It will overwrite whatever you're working on.
 
 Buttons
 -------------
