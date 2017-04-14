@@ -40,20 +40,27 @@
 
          <div id="vertical-divider"></div>
 
+
+
          <div id="right-div">
+              <ul class="nav nav-tabs">
+                <li id="tabTemplate" class="active"><a href="#" data-toggle="tab">Template</a></li>
+                <li id="tabNode"><a href="#" data-toggle="tab">Node</a></li>
+              </ul>
+
               <form id="node-form">
-                   <div class="one-line-div form-group">
-                         <p><strong>Node id: </strong></p><p id="nodeId"></p>
-                   </div>
+                <div class="one-line-div form-group">
+                     <p><strong>Node id: </strong></p><p id="nodeId"></p>
+                </div>
                 <div class="form-group">
                        <label for="name">Node Name</label>
                        <textarea id="name" class="form-control" rows="1"></textarea>
-                 </div>
-                 <div class="form-group">
+                </div>
+                <div class="form-group">
                       <label for="sel1">Parent Node</label>
                       <select id="parentSelect" class="form-control"></select>
-                 </div>
-                <div class="form-group">
+                </div>
+                <!-- <div class="form-group">
                       <label for="actor">Actor</label>
                       <textarea id="actor" class="form-control" rows="1"></textarea>
                  </div>
@@ -68,7 +75,7 @@
                <div class="form-group">
                      <label for="condition">Condition</label>
                      <textarea id="condition" class="form-control" rows="1"></textarea>
-               </div>
+               </div> -->
 
                <button id="submitBtn" type="button" class="btn btn-primary">Submit</button>
               </form>

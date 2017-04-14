@@ -106,8 +106,35 @@ function renderList(masterObj, nodeHash) {
      if (Object.keys(masterObj).length > 0)
           drawTree(masterObj, nodeHash, masterObj["0"])
      // Assign click handler for each node <li>
-     $("li").click(function() {
+     $("#master-list li").click(function() {
           var id = $(this).attr("id")
           showNode(masterObj[id.toString()], nodeHash)
      })
+}
+
+function generateNodeFormHtml(arr) {
+     // Can't have two attributes with the same name
+     var containedAttributes = ["nodeId", "name", "parentSelect"]
+     // Parent Node attribute is conveniently guaranteed to be what we want to insert after
+     var insertAfter = $("#parentSelect").parent('div')
+     for (var i = 0; i < arr.length; i++) {
+          var obj = arr[i]
+          var camelCase = obj.attribute.charAt(0).toLowerCase() + obj.attribute.slice(1).replace(/\s/g, "")
+          if ($.inArray(camelCase, containedAttributes) != -1) { // -1 means it's not in the array
+               alert("You can't have more than one of the same attribute!")
+               continue
+          }
+          var defaultVal = (obj.default) ? obj.default : ""
+          var html = "<div class='form-group'>" +
+                         "<label for='" + camelCase + "'>" +
+                              obj.attribute +
+                         "</label>" +
+                         "<textarea id='" + camelCase + "' class='form-control' rows='1'>" +
+                              defaultVal +
+                         "</textarea>" +
+                    "</div>"
+          $(insertAfter).after(html)
+          insertAfter = $("#"+camelCase).parent('div')
+          containedAttributes.push(camelCase)
+     }
 }

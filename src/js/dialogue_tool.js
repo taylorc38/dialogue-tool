@@ -3,6 +3,34 @@ var masterObj = JSON.parse(localStorage.masterObj || "{}")
 var nodeHash = JSON.parse(localStorage.nodeHash || "{}")
 renderList(masterObj, nodeHash)
 
+// Configuration
+// var configObj = {
+//      "name" : {
+//           "_type" : "string",
+//           "default" : ""
+//      },
+//      "previous" : {
+//           "_type" : "int",
+//           "default" : -1
+//      },
+//      "connections" : {
+//
+//      }
+// }
+var configArr = []
+configArr.push({ "attribute" : "Message Node", "default" : "Hello world" })
+generateNodeFormHtml(configArr)
+
+/* *********** Set up Template & Node tabs ************* */
+
+$("#tabTemplate").click(function() {
+
+})
+
+$("#tabNode").click(function() {
+
+})
+
 /* ************* Populate parent list ****************** */
 
 $("#parentSelect").append($("<option>-</option>"))
