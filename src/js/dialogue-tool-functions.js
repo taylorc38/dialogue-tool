@@ -4,11 +4,14 @@ function clearForm() {
      $("#parentSelect").prop("disabled", false)
 }
 
-// If there is a nodeId arg in the url, we should display the form values for that node
-function gotoNodeById(id) {
-     location.replace(location.href + "?node=" + id)
+function getNameById(hash, id) {
+     for (var key in hash) {
+          if (hash[key] == id)
+               return key
+     }
 }
 
+// Makes sure the parent has been specified and exists before attaching a new node
 function validatePrevious(parentStr) {
      if (parentStr == "") {
           throw { message : "You need to enter a parent for this node!" }
@@ -18,25 +21,40 @@ function validatePrevious(parentStr) {
      return nodeHash[parentStr]
 }
 
-// Recursive function to delete a node and all its children
+function removeFromTree(masterObj, nodeHash, name) {
+     var name = $("#name").val()
+     if (name in nodeHash) {
+          var node = masterObj[nodeHash[name].toString()]
+
+          // Remove the connection to this node in its parent
+          var parentNode = masterObj[node.previous.toString()]
+          if (parentNode) {
+               var i = parentNode.connections.indexOf(node.nodeId)
+               parentNode.connections.splice(i, 1)
+               masterObj[parentNode.nodeId.toString()] = parentNode
+          }
+
+          // Remove this node and its children recursively
+          return deleteNode(masterObj, nodeHash, node)
+     } else {
+          throw { message: "Please enter a valid node name to delete" }
+     }
+}
+
+// Recursive helper function to delete a node and all its children
 function deleteNode(masterObj, nodeHash, node) {
      // Remove all children
      for (var i = 0; i < node.connections.length; i++) {
           var child = masterObj[node.connections[i].toString()]
           deleteNode(masterObj, nodeHash, child)
      }
+     // Remove this node from masterObj and nodeHash
      var name = getNameById(nodeHash, node.nodeId)
      delete nodeHash[name]
      delete masterObj[node.nodeId.toString()]
      return { "masterObj" : masterObj, "nodeHash" : nodeHash }
 }
 
-function getNameById(hash, id) {
-     for (var key in hash) {
-          if (hash[key] == id)
-               return key
-     }
-}
 
 function showNode(obj, nodeHash) {
      $("#nodeId").html(obj.nodeId)
@@ -48,18 +66,33 @@ function showNode(obj, nodeHash) {
      $("#parentSelect").val(getNameById(nodeHash, obj.previous)).prop("disabled", true)
 }
 
+/*
+Recursive function to generate HTML to represent our dialogue tree
+Example:
+     <ul id="master-list">
+          <li id="0">root</li>
+          <ul id="0-children">
+               <li id="1">NodeA</li>
+               <ul id="1-children">
+                    <li id="2">NodeB</li>
+               </ul>
+          </ul>
+     </ul>
+*/
 function drawTree(masterObj, nodeHash, node) {
+     // Create the html string for this node
      var name = getNameById(nodeHash, node.nodeId)
      var id = node.nodeId.toString()
      var htmlStr = "<li id='"+id+"'>"+name+"</li>"
      var addStr = node.connections.length > 0
-          ? "<ul id='"+id+"-list' class='node-list'></ul>"
+          ? "<ul id='"+id+"-children' class='node-list'></ul>"
           : ""
+     // Append this node to its parent
      var parentId = node.nodeId == 0
-                         ? "master-list"
-                         : masterObj[node.previous.toString()].nodeId + "-list"
-
+                    ? "master-list"
+                    : masterObj[node.previous.toString()].nodeId + "-children"
      $("#"+parentId).append(htmlStr + addStr)
+     // Repeat this process for each child of this node
      for (var i = 0; i < node.connections.length; i++) {
           var child = masterObj[node.connections[i].toString()]
           drawTree(masterObj, nodeHash, child)
@@ -67,38 +100,14 @@ function drawTree(masterObj, nodeHash, node) {
 }
 
 function renderList(masterObj, nodeHash) {
+     // Clear the previously generated html
      $("#master-list li").remove()
-
+     // Generate more of it
      if (Object.keys(masterObj).length > 0)
           drawTree(masterObj, nodeHash, masterObj["0"])
-
+     // Assign click handler for each node <li>
      $("li").click(function() {
           var id = $(this).attr("id")
           showNode(masterObj[id.toString()], nodeHash)
      })
 }
-
-// function validateConnections(childrenStr) {
-//      return childrenStr
-//                .replace(/\s+/g, "")
-//                .split(",")
-//                .filter(function(nodeName) {
-//                     var isValid = nodeHash[nodeName] != null
-//                     if (!isValid)
-//                          throw { message : "It looks like you've entered children nodes that don't exist!" }
-//                     return isValid && nodeName != ""
-//                })
-//                .map(function(nodeName) {
-//                     return nodeHash[nodeName]
-//                })
-// }
-
-     // Append each node to the list
-     // for (var i = 0; i < Object.keys(masterObj).length; i++) {
-     //      var name = getNameById(nodeHash, i)
-     //      $("#master-list").append(
-     //           $("<li>").append(
-     //                $("<a>").attr("id", name).html(name)
-     //           )
-     //      )
-     // }

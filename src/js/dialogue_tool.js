@@ -1,49 +1,10 @@
+// Retrieve from web storage and render our node tree
 var masterObj = JSON.parse(localStorage.masterObj || "{}")
 var nodeHash = JSON.parse(localStorage.nodeHash || "{}")
-
-// Render the list
 renderList(masterObj, nodeHash)
 
-var handleFileSelect = function(event) {
-     var file = event.target.files[0]
-     var reader = new FileReader()
-     reader.readAsText(file)
-     reader.onload = function() {
-          if (confirm("Are you sure you want to import this file?")) {
-               try {
-                    var content = JSON.parse(reader.result)
-                    masterObj = content
-                    nodeHash = {}
-                    // create a new nodeHash, nodeId will be used as default node name
-                    for (var key in masterObj) {
-                         var node = masterObj[key]
-                         var name = "Node" + node.nodeId
-                         nodeHash[name] = node.nodeId
-                    }
-                    // Save to web storage
-                    localStorage.masterObj = JSON.stringify(masterObj)
-                    localStorage.nodeHash = JSON.stringify(nodeHash)
-                    location.reload()
-               } catch (err) {
-                    alert("There was an error importing your file: " + err)
-                    $("#fileInput").val("") // reset file input element
-               }
-          }
-     }
-}
+/* ************* Populate parent list ****************** */
 
-// Set file input event handler
-if (window.File && window.FileReader) {
-      $("#fileInput").change(function(event) {
-           handleFileSelect(event)
-      })
-} else {
-     alert("Your browser doesn't support importing JSON files. Sorry!");
-     $("#fileInput").prop("disabled", true)
-}
-
-
-// Set the Parent Node dropdown
 $("#parentSelect").append($("<option>-</option>"))
 $.each(nodeHash, function(key, value) {
      $('#parentSelect')
@@ -52,13 +13,7 @@ $.each(nodeHash, function(key, value) {
                     .text(key));
 });
 
-// Clear Storage button removes masterObj & nodehash and refreshes the page
-$("#clearStorage").click(function() {
-     if (confirm("Are you sure?")) {
-          localStorage.clear()
-          location.reload()
-     }
-})
+/* *************** Button handlers ****************** */
 
 $("#addBtn").click(function() {
      clearForm()
@@ -66,43 +21,33 @@ $("#addBtn").click(function() {
 
 $("#deleteBtn").click(function() {
      var name = $("#name").val()
-     if (name in nodeHash) {
-          var node = masterObj[nodeHash[name].toString()]
-          // Remove the connection to this node in its parent
-          var parentNode = masterObj[node.previous.toString()]
-          if (parentNode) {
-               var i = parentNode.connections.indexOf(node.nodeId)
-               parentNode.connections.splice(i, 1)
-               masterObj[parentNode.nodeId.toString()] = parentNode
-          }
-          // Remove this node and its children
-          var result = deleteNode(masterObj, nodeHash, node)
+     try {
+          var result = removeFromTree(masterObj, nodeHash, name)
           masterObj = result.masterObj
           nodeHash = result.nodeHash
 
           // Save to web storage
           localStorage.masterObj = JSON.stringify(masterObj)
           localStorage.nodeHash = JSON.stringify(nodeHash)
-
           location.reload()
-     } else {
-          alert("Please enter a valid Node Name to delete")
+     } catch (err) {
+          alert(err.message)
      }
 })
 
 $("#submitBtn").click(function() {
+     // Since user can't change nodeId, we can use it to determine whether we are editing a node or creating a new one
+     var editing = ($("#nodeId").html() != "")
+
      // If we are editing an existing node, we should use the nodeId it already has
+     var nodeId = (editing)
+                    ? parseInt($("#nodeId").html())
+                    : Object.keys(masterObj).length
+
      // We will also need to preserve its connections
-     var editing = false
-     if ($("#nodeId").html() != "") {
-          editing = true
-     }
-     var nodeId = Object.keys(masterObj).length
-     var connections = []
-     if (editing) {
-          nodeId = parseInt($("#nodeId").html())
-          connections = masterObj[nodeId.toString()].connections
-     }
+     var connections = (editing)
+                         ? masterObj[nodeId.toString()].connections
+                         : []
 
      // Validate previous and convert to nodeId
      var previous = -1
@@ -154,12 +99,59 @@ $("#submitBtn").click(function() {
      localStorage.masterObj = JSON.stringify(masterObj)
      localStorage.nodeHash = JSON.stringify(nodeHash)
 
-     // Clear the form
-     clearForm()
-
      // Reload the page
      location.reload()
 })
+
+// Clear Storage button removes masterObj & nodehash and refreshes the page
+$("#clearStorage").click(function() {
+     if (confirm("Are you sure?")) {
+          localStorage.clear()
+          location.reload()
+     }
+})
+
+/* ************* File Input ************** */
+
+var handleFileSelect = function(event) {
+     var file = event.target.files[0]
+     var reader = new FileReader()
+     reader.readAsText(file)
+     reader.onload = function() {
+          if (confirm("Are you sure you want to import this file?")) {
+               try {
+                    var content = JSON.parse(reader.result)
+                    masterObj = content
+                    nodeHash = {}
+                    // create a new nodeHash, nodeId will be used as default node name
+                    for (var key in masterObj) {
+                         var node = masterObj[key]
+                         var name = "Node" + node.nodeId
+                         nodeHash[name] = node.nodeId
+                    }
+                    // Save to web storage
+                    localStorage.masterObj = JSON.stringify(masterObj)
+                    localStorage.nodeHash = JSON.stringify(nodeHash)
+                    location.reload()
+               } catch (err) {
+                    alert("There was an error importing your file: " + err)
+                    $("#fileInput").val("") // reset file input element
+               }
+          }
+     }
+}
+
+// Set file input event handler
+if (window.File && window.FileReader) {
+      $("#fileInput").change(function(event) {
+           handleFileSelect(event)
+      })
+} else {
+     alert("Your browser doesn't support importing JSON files. Sorry!");
+     $("#fileInput").prop("disabled", true)
+}
+
+/* **************** Export ****************** */
 
 // Basically creates a link that downloads the json file, simulates a click, then removes it
 $("#downloadBtn").click(function() {
