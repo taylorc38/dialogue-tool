@@ -3,43 +3,45 @@ var masterObj = JSON.parse(localStorage.masterObj || "{}")
 var nodeHash = JSON.parse(localStorage.nodeHash || "{}")
 renderList(masterObj, nodeHash)
 
-// Configuration
-// var configObj = {
-//      "name" : {
-//           "_type" : "string",
-//           "default" : ""
-//      },
-//      "previous" : {
-//           "_type" : "int",
-//           "default" : -1
-//      },
-//      "connections" : {
-//
-//      }
-// }
+// Let the user define what attributes they want their nodes to have
 var configArr = []
 configArr.push({ "attribute" : "Message Node", "default" : "Hello world" })
-generateNodeFormHtml(configArr)
 
 /* *********** Set up Template & Node tabs ************* */
+var currentTabIndex = localStorage.currentTabIndex || 0 // web storage holds strings only
+switch (parseInt(currentTabIndex)) {
+     case 0: // Template
+          $("#tabTemplate").addClass('active')
+          $("#tabNode").removeClass('active')
+          displayTemplateTab()
+          break
+     case 1: // Node
+          $("#tabNode").addClass('active')
+          $("#tabTemplate").removeClass('active')
+          displayNodeTab(configArr)
+          populateParentList(nodeHash)
+          break
+     default:
+          // do nothing
+}
 
-$("#tabTemplate").click(function() {
-
+$("#tab-list li").click(function() {
+     if ($(this).index() == parseInt(currentTabIndex)) return
+     currentTabIndex = $(this).index().toString()
+     localStorage.currentTabIndex = currentTabIndex
+     $("#tab-content").html("")
+     switch (parseInt(currentTabIndex)) {
+          case 0: // template
+               displayTemplateTab()
+               break
+          case 1:
+               displayNodeTab(configArr)
+               populateParentList(nodeHash)
+               break
+          default:
+               // do nothing
+     }
 })
-
-$("#tabNode").click(function() {
-
-})
-
-/* ************* Populate parent list ****************** */
-
-$("#parentSelect").append($("<option>-</option>"))
-$.each(nodeHash, function(key, value) {
-     $('#parentSelect')
-         .append($("<option></option>")
-                    .attr("value",key)
-                    .text(key));
-});
 
 /* *************** Button handlers ****************** */
 
@@ -93,6 +95,7 @@ $("#submitBtn").click(function() {
      if (nodeId > 0 && !editing)
           masterObj[previous+""].connections.push(nodeId)
 
+// TODO integrate user-defined attributes
      // turn form data into an object
      var obj = {
           "nodeId" : nodeId,
@@ -135,6 +138,10 @@ $("#submitBtn").click(function() {
 $("#clearStorage").click(function() {
      if (confirm("Are you sure?")) {
           localStorage.clear()
+          if (!confirm("Delete template?")) {
+               // we still have access to the config local variable, so set it to web storage
+               // localStorage.configObj = configObj
+          }
           location.reload()
      }
 })

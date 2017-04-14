@@ -112,7 +112,61 @@ function renderList(masterObj, nodeHash) {
      })
 }
 
-function generateNodeFormHtml(arr) {
+function displayTemplateTab() {
+
+}
+
+// <form id="node-form">
+//   <div class="one-line-div form-group">
+//        <p><strong>Node id: </strong></p><p id="nodeId"></p>
+//   </div>
+//   <div class="form-group">
+//          <label for="name">Node Name</label>
+//          <textarea id="name" class="form-control" rows="1"></textarea>
+//   </div>
+//   <div class="form-group">
+//         <label for="sel1">Parent Node</label>
+//         <select id="parentSelect" class="form-control"></select>
+//   </div>
+// <!-- <button id="submitBtn" type="button" class="btn btn-primary">Submit</button> -->
+
+function populateParentList(nodeHash) {
+     $("#parentSelect").append($("<option>-</option>"))
+     $.each(nodeHash, function(key, value) {
+          $('#parentSelect')
+              .append($("<option></option>")
+                         .attr("value",key)
+                         .text(key));
+     });
+}
+
+// Generate html for the node form
+function displayNodeTab(configArr) {
+     $("#tab-content").html(
+          $("<form id='node-form'>").append(
+               $("<div class='one-line-div form-group'>").append(
+                    $("<p><strong>Node id: </strong></p><p id='nodeId'></p>")
+               )
+          ).append(
+               $("<div class='form-group'>").append(
+                    $("<label for='name'>").html("Node Name")
+               ).append(
+                    $("<textarea id='name' class='form-control' rows='1'>")
+               )
+          ).append(
+               $("<div class='form-group'>").append(
+                    $("<label for='sel1'>").html("Parent Node")
+               ).append(
+                    $("<select id='parentSelect' class='form-control'>")
+               )
+          ).append(
+               $("<button id='submitBtn' type='button' class='btn btn-primary'>").html("Submit")
+          )
+     )
+     appendConfigAttributes(configArr)
+}
+
+function appendConfigAttributes(arr) {
      // Can't have two attributes with the same name
      var containedAttributes = ["nodeId", "name", "parentSelect"]
      // Parent Node attribute is conveniently guaranteed to be what we want to insert after
