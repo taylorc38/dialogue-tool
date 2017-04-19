@@ -72,3 +72,11 @@
 .one-line-div p {
      display: inline;
 }
+
+#tab-content p {
+     margin-top: 20px;
+}
+
+#tab-content ul {
+     list-style: none;
+}

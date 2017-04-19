@@ -113,7 +113,25 @@ function renderList(masterObj, nodeHash) {
 }
 
 function displayTemplateTab() {
-
+     $("#tab-content").append(
+          $("<div class='container'>").append(
+               $("<p>").html(
+                    "Please enter the attributes you want your node to have." +
+                    "</br>" +
+                    "Note: all nodes will automatically have the following attributes: Node Name, Parent Node, Node id"
+               )
+          ).append(
+               $("<ul id='template-list'>").append(
+                    $("<li>").append(
+                         $("<button type='button' class='btn btn-primary'>").html(
+                              $("<span class='glyphicon glyphicon-plus'>")
+                         ).click(function() {
+                              // append an attribute
+                         })
+                    ).append(" Add an attribute")
+               )
+          )
+     )
 }
 
 // <form id="node-form">

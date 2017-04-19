@@ -5,7 +5,7 @@ renderList(masterObj, nodeHash)
 
 // Let the user define what attributes they want their nodes to have
 var configArr = []
-configArr.push({ "attribute" : "Message Node", "default" : "Hello world" })
+configArr.push({ "attribute" : "Message", "default" : "Hello world" })
 
 /* *********** Set up Template & Node tabs ************* */
 var currentTabIndex = localStorage.currentTabIndex || 0 // web storage holds strings only
