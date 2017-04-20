@@ -4,10 +4,14 @@ var nodeHash = JSON.parse(localStorage.nodeHash || "{}")
 renderList(masterObj, nodeHash)
 
 // Let the user define what attributes they want their nodes to have
-var configArr = []
-configArr.push({ "attribute" : "Message", "default" : "Hello world" })
+var defaultAttrCounter = 0
+var configArr = JSON.parse(localStorage.configArr || null)
+configArr = configArr == null ? [] : configArr
+
+var nodeTemplateMap = JSON.parse(localStorage.nodeTemplateMap || "{}")
 
 /* *********** Set up Template & Node tabs ************* */
+
 var currentTabIndex = localStorage.currentTabIndex || 0 // web storage holds strings only
 switch (parseInt(currentTabIndex)) {
      case 0: // Template
@@ -99,12 +103,12 @@ $("#submitBtn").click(function() {
      // turn form data into an object
      var obj = {
           "nodeId" : nodeId,
-          "actor" : $("#actor").val(),
-          "condition" : $("#condition").val(),
-          "msg" : $("#message").val(),
-          "type" : $("#type").val(),
           "previous" : previous,
           "connections" : connections
+     }
+
+     for (var key in nodeTemplateMap) {
+          obj[key] = $(nodeTemplateMap[key]).val()
      }
 
      // Store the name in a hash map
@@ -135,13 +139,10 @@ $("#submitBtn").click(function() {
 })
 
 // Clear Storage button removes masterObj & nodehash and refreshes the page
-$("#clearStorage").click(function() {
+$("#clearNodes").click(function() {
      if (confirm("Are you sure?")) {
-          localStorage.clear()
-          if (!confirm("Delete template?")) {
-               // we still have access to the config local variable, so set it to web storage
-               // localStorage.configObj = configObj
-          }
+          localStorage.masterObj = JSON.stringify({})
+          localStorage.nodeHash = JSON.stringify({})
           location.reload()
      }
 })

@@ -80,3 +80,24 @@
 #tab-content ul {
      list-style: none;
 }
+
+#template-submit-btn {
+     margin-top: 20px;
+}
+
+#template-list textarea {
+     width: 20%;
+     vertical-align: top;
+     display: inline;
+}
+
+#clearTemplateBtn {
+     vertical-align: bottom;
+     margin-left: 10px;
+}
+
+/* Delete buttons in template */
+.align-to-input {
+     margin-left: 10px;
+     vertical-align: top;
+}

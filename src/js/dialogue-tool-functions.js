@@ -57,13 +57,23 @@ function deleteNode(masterObj, nodeHash, node) {
 
 
 function showNode(obj, nodeHash) {
+     console.log(JSON.stringify(obj))
      $("#nodeId").html(obj.nodeId)
      $("#name").val(getNameById(nodeHash, obj.nodeId))
-     $("#actor").val(obj.actor)
-     $("#condition").val(obj.condition)
-     $("#message").val(obj.msg)
-     $("#type").val(obj.type)
      $("#parentSelect").val(getNameById(nodeHash, obj.previous)).prop("disabled", true)
+     // For every key in our nodeTemplateMap, there's a key in our node object that holds the value for that attribute
+     for (var key in nodeTemplateMap) {
+          var selector = nodeTemplateMap[key]
+          var matchFound = false
+          for (var objKey in obj) {
+               if (key.toLowerCase() == objKey.toLowerCase()) {
+                    $(selector).val(obj[objKey])
+                    matchFound = true
+               }
+          }
+          if (!matchFound)
+               $(selector).val("")
+     }
 }
 
 /*
@@ -122,16 +132,108 @@ function displayTemplateTab() {
                )
           ).append(
                $("<ul id='template-list'>").append(
-                    $("<li>").append(
-                         $("<button type='button' class='btn btn-primary'>").html(
+                    $("<li id='append-attr-li'>").html(
+                         $("<button id='append-attr-btn' type='button' class='btn btn-primary'>").html(
                               $("<span class='glyphicon glyphicon-plus'>")
                          ).click(function() {
                               // append an attribute
+                              var attributeId = "attribute-" + defaultAttrCounter
+                              defaultAttrCounter++
+                              $("<li id='"+attributeId+"'>").html(
+                                   $("<div class='form-group'>").html(
+                                        $("<textarea id='"+attributeId+"-textarea' class='form-control' rows='1'>").html(attributeId)
+                                   ).append(
+                                        $("<button type='button' class='btn btn-danger align-to-input'>").html(
+                                             $("<span class='glyphicon glyphicon-trash'>")
+                                        ).click(function() {
+                                             // DELETE ATTRIBUTE
+                                             // TODO using the textarea value is a sketchy way to do this...
+                                             var textArea = $(this).siblings("textarea")
+                                             var configIndex = configArr.indexOf(textArea.val())
+                                             configArr.splice(configIndex, 1)
+                                             // Remove from masterObj nodes
+                                             // for (var key in masterObj) {
+                                             //      for (var nodeKey in masterObj[key]) {
+                                             //           if (nodeKey.toLowerCase() == textArea.val()) {
+                                             //                delete masterObj[key][nodeKey]
+                                             //                localStorage.masterObj = JSON.stringify(masterObj)
+                                             //                break
+                                             //           }
+                                             //      }
+                                             // }
+                                             // Remove the html element
+                                             $(this).parents("li").remove()
+                                        })
+                                   )
+                              ).insertBefore($("#append-attr-li"))
                          })
                     ).append(" Add an attribute")
+               ).append(
+                    $("<button id='template-submit-btn' type='button' class='btn btn-primary'>").html("Save Template").click(function() {
+                         // SUBMIT TEMPLATE AND GO TO NODE FORM
+                         configArr = []
+                         $("#template-list li").each(function(index, li) {
+                              // This is our append button
+                              if ($(li).attr("id") == "append-attr-li")
+                                   return
+                              // Enter this attribute into configArr if not already in it
+                              var attributeName = $(li).find("textarea").val()
+                              if (configArr.indexOf(attributeName) == -1) {
+                                   configArr.push(attributeName)
+                              }
+                         })
+                         localStorage.configArr = JSON.stringify(configArr)
+                         // Now that we've created our template, switch to node view to being editing
+                         localStorage.currentTabIndex = 1
+                         location.reload()
+                    })
+               ).append(
+                    $("<button id='clearTemplateBtn' type='button' class='btn btn-warning'>").html("Clear Template").click(function() {
+                         // DELETE THE TEMPLATE
+                         if (confirm("Are you sure?")) {
+                              configArr = []
+                              localStorage.configArr = JSON.stringify(configArr)
+                              localStorage.nodeTemplateMap = JSON.stringify({})
+                              location.reload()
+                         }
+                    })
                )
           )
      )
+     appendConfigAttributesToTemplateTab()
+}
+
+function appendConfigAttributesToTemplateTab() {
+     for (var i = 0; i < configArr.length; i++) {
+          var attr = configArr[i]
+          var attributeId = "attribute-" + defaultAttrCounter
+          defaultAttrCounter++
+          $("<li id='"+attributeId+"'>").html(
+               $("<div class='form-group'>").html(
+                    $("<textarea id='"+attributeId+"-textarea' class='form-control' rows='1'>").html(attr)
+               ).append(
+                    $("<button type='button' class='btn btn-danger align-to-input'>").html(
+                         $("<span class='glyphicon glyphicon-trash'>")
+                    ).click(function() {
+                         var textArea = $(this).siblings("textarea")
+                         var configIndex = configArr.indexOf(textArea.val())
+                         configArr.splice(configIndex, 1)
+                         // Remove from masterObj nodes
+                         // for (var key in masterObj) {
+                         //      for (var nodeKey in masterObj[key]) {
+                         //           if (nodeKey.toLowerCase() == textArea.val()) {
+                         //                delete masterObj[key][nodeKey]
+                         //                localStorage.masterObj = JSON.stringify(masterObj)
+                         //                break
+                         //           }
+                         //      }
+                         // }
+                         // Remove the html element
+                         $(this).parents("li").remove()
+                    })
+               )
+          ).insertBefore($("#append-attr-li"))
+     }
 }
 
 // <form id="node-form">
@@ -181,32 +283,35 @@ function displayNodeTab(configArr) {
                $("<button id='submitBtn' type='button' class='btn btn-primary'>").html("Submit")
           )
      )
-     appendConfigAttributes(configArr)
+     appendConfigAttributesToNodeTab(configArr)
 }
 
-function appendConfigAttributes(arr) {
+function appendConfigAttributesToNodeTab(arr) {
      // Can't have two attributes with the same name
      var containedAttributes = ["nodeId", "name", "parentSelect"]
      // Parent Node attribute is conveniently guaranteed to be what we want to insert after
      var insertAfter = $("#parentSelect").parent('div')
      for (var i = 0; i < arr.length; i++) {
-          var obj = arr[i]
-          var camelCase = obj.attribute.charAt(0).toLowerCase() + obj.attribute.slice(1).replace(/\s/g, "")
+          var attribute = arr[i]
+          var camelCase = attribute.charAt(0).toLowerCase() + attribute.slice(1).replace(/\s/g, "")
           if ($.inArray(camelCase, containedAttributes) != -1) { // -1 means it's not in the array
                alert("You can't have more than one of the same attribute!")
                continue
           }
-          var defaultVal = (obj.default) ? obj.default : ""
           var html = "<div class='form-group'>" +
                          "<label for='" + camelCase + "'>" +
-                              obj.attribute +
+                              attribute +
                          "</label>" +
                          "<textarea id='" + camelCase + "' class='form-control' rows='1'>" +
-                              defaultVal +
                          "</textarea>" +
                     "</div>"
           $(insertAfter).after(html)
           insertAfter = $("#"+camelCase).parent('div')
           containedAttributes.push(camelCase)
+
+          // Add to nodeTemplateMap so we know what to output in each node
+          var selector = "#"+camelCase
+          nodeTemplateMap[camelCase] = selector // selector is how we will access our values
      }
+     localStorage.nodeTemplateMap = JSON.stringify(nodeTemplateMap)
 }
