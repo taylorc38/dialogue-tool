@@ -152,15 +152,15 @@ function displayTemplateTab() {
                                              var configIndex = configArr.indexOf(textArea.val())
                                              configArr.splice(configIndex, 1)
                                              // Remove from masterObj nodes
-                                             // for (var key in masterObj) {
-                                             //      for (var nodeKey in masterObj[key]) {
-                                             //           if (nodeKey.toLowerCase() == textArea.val()) {
-                                             //                delete masterObj[key][nodeKey]
-                                             //                localStorage.masterObj = JSON.stringify(masterObj)
-                                             //                break
-                                             //           }
-                                             //      }
-                                             // }
+                                             for (var key in masterObj) {
+                                                  for (var nodeKey in masterObj[key]) {
+                                                       if (nodeKey.toLowerCase() == textArea.val()) {
+                                                            delete masterObj[key][nodeKey]
+                                                            localStorage.masterObj = JSON.stringify(masterObj)
+                                                            break
+                                                       }
+                                                  }
+                                             }
                                              // Remove the html element
                                              $(this).parents("li").remove()
                                         })
@@ -218,6 +218,7 @@ function appendConfigAttributesToTemplateTab() {
                          var textArea = $(this).siblings("textarea")
                          var configIndex = configArr.indexOf(textArea.val())
                          configArr.splice(configIndex, 1)
+                         console.log(JSON.stringify(configArr))
                          // Remove from masterObj nodes
                          // for (var key in masterObj) {
                          //      for (var nodeKey in masterObj[key]) {
@@ -228,6 +229,7 @@ function appendConfigAttributesToTemplateTab() {
                          //           }
                          //      }
                          // }
+                         // console.log(JSON.stringify(masterObj))
                          // Remove the html element
                          $(this).parents("li").remove()
                     })

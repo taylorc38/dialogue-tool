@@ -165,9 +165,21 @@ var handleFileSelect = function(event) {
                          var name = "Node" + node.nodeId
                          nodeHash[name] = node.nodeId
                     }
+                    // create a template from the node structure
+                    configArr = []
+                    var node = masterObj["0"]
+                    var defaultAttributes = ["nodeId", "connections", "previous"]
+                    for (var key in node) {
+                         console.log("key: " + key)
+                         if (defaultAttributes.indexOf(key) == -1) {
+                              configArr.push(key)
+                         }
+                    }
+                    alert("Hello")
                     // Save to web storage
                     localStorage.masterObj = JSON.stringify(masterObj)
                     localStorage.nodeHash = JSON.stringify(nodeHash)
+                    localStorage.configArr = JSON.stringify(configArr)
                     location.reload()
                } catch (err) {
                     alert("There was an error importing your file: " + err)
